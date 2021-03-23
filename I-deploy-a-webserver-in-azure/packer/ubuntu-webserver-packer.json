@@ -1,0 +1,45 @@
+{
+  "variables": {
+    "client_id": "{{env `CLIENT_ID`}}",
+    "client_secret": "{{env `CLIENT_SECRET`}}",
+    "subscription_id": "{{env `SUBSCRIPTION_ID`}}"
+  },
+  "builders": [
+    {
+      "type": "azure-arm",
+      "azure_tags": {
+        "name": "grayfox-ubuntu18.04"
+      },
+      "client_id": "{{user `client_id`}}",
+      "client_secret": "{{user `client_secret`}}",
+      "subscription_id": "{{user `subscription_id`}}",
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "18.04-LTS",
+      "managed_image_resource_group_name": "packer-rg",
+      "managed_image_name": "grayfox-ubuntu18.04",
+      "location": "westeurope",
+      "vm_size": "Standard_A2"
+    }
+  ],
+  "provisioners": [
+    {
+      "inline": [
+        "sudo mkdir -p /opt/www",
+        "echo 'Hello, World!' > index.html",
+        "echo '[Unit]' > http.service",
+        "echo 'Description=HTTP Hello World' >> http.service",
+        "echo '[Service]' >> http.service",
+        "echo 'ExecStart=/bin/busybox httpd -f -h /home/packer/ -p 80' >> http.service",
+        "echo '[Install]' >> http.service",
+        "echo 'WantedBy=multi-user.target' >> http.service",
+        "sudo cp http.service /etc/systemd/system/",
+        "sudo systemctl daemon-reload",
+        "sudo systemctl enable http.service"
+      ],
+      "inline_shebang": "/bin/sh -x",
+      "type": "shell"
+    }
+  ]
+}
