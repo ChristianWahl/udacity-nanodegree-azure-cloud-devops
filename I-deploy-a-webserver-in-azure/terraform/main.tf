@@ -19,8 +19,7 @@ resource "azurerm_resource_group" "main" {
 
 resource "azurerm_virtual_network" "main" {
   name = "${var.prefix}-network"
-  address_space = [
-    "10.0.0.0/16"]
+  address_space = ["10.0.0.0/16"]
   location = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   tags = {
@@ -32,8 +31,7 @@ resource "azurerm_subnet" "internal" {
   name = "internal"
   resource_group_name = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes = [
-    "10.0.2.0/24"]
+  address_prefixes = ["10.0.2.0/24"]
 }
 
 resource "azurerm_network_interface" "main" {
@@ -84,8 +82,8 @@ resource "azurerm_network_security_group" "main" {
   }
 
   security_rule {
-    name = "allow-inbound-internal"
-    description = "Allow access to other VMs on the subnet"
+    name = "allow-all-inbound-internal"
+    description = "Allow all inbound traffic for VMs on the subnet"
     priority = 100
     direction = "Inbound"
     access = "Allow"
@@ -97,20 +95,21 @@ resource "azurerm_network_security_group" "main" {
   }
 
   security_rule {
-    name = "internet-access-rule"
+    name = "http-access-rule"
+    description = "Allow all inbound traffic from the internet for port 80 (HTTP)"
+    priority = 200
     direction = "Inbound"
     access = "Allow"
-    priority = 200
+    protocol = "Tcp"
     source_port_range = "*"
-    destination_port_range = "*"
+    destination_port_range = "80"
     source_address_prefix = "*"
     destination_address_prefix = "*"
-    protocol = "Tcp"
   }
 
   security_rule {
-    name = "deny-inbound-internal"
-    description = "Deny all inbound traffic outside of the vnet from the Internet"
+    name = "deny-inbound"
+    description = "Deny all inbound traffic from the Internet"
     priority = 300
     direction = "Inbound"
     access = "Deny"
@@ -178,13 +177,12 @@ resource "azurerm_linux_virtual_machine" "main" {
   name = "${var.prefix}-vm${count.index}"
   resource_group_name = azurerm_resource_group.main.name
   location = azurerm_resource_group.main.location
-  size = "Standard_F2"
-  admin_username = "adminuser"
-  admin_password = "P@ssw0rd1234!"
+  size = var.vm_size
+  admin_username = var.vm_user
+  admin_password = var.vm_password
   availability_set_id = azurerm_availability_set.avset.id
   disable_password_authentication = false
-  network_interface_ids = [
-    element(azurerm_network_interface.main.*.id, count.index)]
+  network_interface_ids = [element(azurerm_network_interface.main.*.id, count.index)]
   tags = {
     name = var.prefix
   }
@@ -192,7 +190,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   source_image_id = var.vm_id
 
   os_disk {
-    storage_account_type = "Standard_LRS"
+    storage_account_type = var.vm_disk_type
     caching = "ReadWrite"
   }
 }

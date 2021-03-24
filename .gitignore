@@ -1,4 +1,4 @@
 .idea
 .terraform*
-myplan
 terraform.tfstate*
+.DS_Store
