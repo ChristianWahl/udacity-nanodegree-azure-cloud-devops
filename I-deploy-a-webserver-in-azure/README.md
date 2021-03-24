@@ -63,14 +63,14 @@ variable "instance_count" {
 terraform init
 ```
 
-![terra init output](./images/terra-init.png)
+![terra init output](./img/terra-init.png)
 
 #### Plan infrastructure
 ```bash
 terraform plan -out infra.plan
 ```
 
-![terra plan output](./images/terra-plan.png)
+![terra plan output](./img/terra-plan.png)
 
 #### Create infrastructure
 The Terraform script will also assign and print out a dns name automatically.
@@ -79,7 +79,7 @@ The Terraform script will also assign and print out a dns name automatically.
 terraform apply "infra.plan"
 ```
 
-![terra apply_output](./images/terra-apply.png)
+![terra apply_output](./img/terra-apply.png)
 
 
 #### Show created infrastructure
