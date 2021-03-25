@@ -10,7 +10,7 @@ variable "location" {
 
 variable "instance_count" {
   description = "The count of instances to create."
-  default = 1
+  default = 2
 }
 
 variable "vm_id" {
