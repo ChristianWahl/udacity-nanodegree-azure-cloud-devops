@@ -2,6 +2,11 @@
 
 name: CI
 
+defaults:
+  run:
+    shell: bash
+    working-directory: II-continous-integration
+
 # Controls when the action will run. 
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
@@ -21,8 +26,5 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Change to project dir
-        run: cd II-continous-integration
-        
       - name: Say hello
         run: make hello
